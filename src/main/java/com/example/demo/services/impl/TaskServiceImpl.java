@@ -42,10 +42,9 @@ public class TaskServiceImpl implements TaskService {
     @Transactional
     public Task updateTask(Task task) {
         Optional<Task> forUpdate = repository.findById(task.getId());
-        if (forUpdate.isEmpty()) {
-            throw new TaskNotFoundException(String.format("Task with id: %s doesn't exists", task.getId()));
-        }
-        Task updated = forUpdate.get();
+        Task updated = forUpdate.orElseThrow(() ->
+                new TaskNotFoundException(String.format("Task with id: %s doesn't exists", task.getId()))
+        );
         updated.setText(task.getText());
         return updated;
     }
@@ -57,19 +56,17 @@ public class TaskServiceImpl implements TaskService {
 
     public Task getById(long id) {
         Optional<Task> task = repository.findById(id);
-        if (task.isEmpty()) {
-            throw new TaskNotFoundException(String.format("Task with id: %s doesn't exists", id));
-        }
-        return task.get();
+        return task.orElseThrow(() ->
+                new TaskNotFoundException(String.format("Task with id: %s doesn't exists", id))
+        );
     }
 
     public Task removeTask(long id) {
         Optional<Task> task = repository.findById(id);
-        if (task.isEmpty()) {
-            throw new TaskNotFoundException(String.format("Task with id: %s doesn't exists", id));
-        }
         repository.deleteById(id);
-        return task.get();
+        return task.orElseThrow(() ->
+                new TaskNotFoundException(String.format("Task with id: %s doesn't exists", id))
+        );
     }
 
     public List<Task> removeTasks(List<Task> taskList) {
